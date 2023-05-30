@@ -43,7 +43,7 @@ app.get('/register/:diff', (req: express.Request, res: express.Response) => {
 
   const rank = {
     name: req.query.name,
-    sec: parseInt(req.query.sec),
+    sec: parseFloat(req.query.sec),
   };
 
   store[diff].push(rank);

@@ -51,7 +51,7 @@ app.get('/register/:diff', (req: Request, res: Response) => {
   store[diff].push(rank);
   store[diff].sort((a, b) => a.sec - b.sec);
 
-  console.log(`ip:${req.ip}, rank: ${rank}`);
+  console.log(`ip: ${req.ip}, rank: ${JSON.stringify(rank)}`);
 
   res.send(true);
 });
@@ -60,6 +60,19 @@ app.get('/reset', (req: Request, res: Response) => {
   store.easy.splice(0);
   store.normal.splice(0);
   store.hard.splice(0);
+
+  res.send(true);
+});
+
+app.get('/delete/:diff', (req: Request, res: Response) => {
+  const diff = req.params.diff as string;
+
+  if (!contains(method, diff)) return void res.send(false);
+  if (!req.query.name) return void res.send(false);
+
+  const name = req.query.name as string;
+
+  store[diff] = store[diff].filter((rank, idx) => name !== rank.name);
 
   res.send(true);
 });

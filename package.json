@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "dev": "tsc && node ./dist/app.js",
-    "start": "pm2 start ./dist/app.js --time",
+    "pm2": "pm2 start ./dist/app.js --time",
+    "dev": "tsc && node dist/app.js",
+    "start": "node dist/app.js",
     "send": "scp -r dist package.json package-lock.json jinseok@3.34.97.153:app"
   },
   "keywords": [],

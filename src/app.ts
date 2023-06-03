@@ -1,28 +1,19 @@
 import express from 'express';
-import helmet from 'helmet';
 import type { Request, Response } from 'express';
+import helmet from 'helmet';
 
 import { contains } from './util';
+import { DIFFICULTY, readStoreFromFile, writeStoreToFile } from './store';
+import type { Store, Rank } from './store';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-interface rank {
-  name: string;
-  sec: number;
-}
-
-const method = ['easy', 'normal', 'hard'] as const;
-
-const store = {
-  easy: [] as rank[],
-  normal: [] as rank[],
-  hard: [] as rank[],
-};
-
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const store = readStoreFromFile();
 
 app.get('/', (req: Request, res: Response) => {
   res.json(store);
@@ -31,7 +22,7 @@ app.get('/', (req: Request, res: Response) => {
 app.get('/get/:diff', (req: Request, res: Response) => {
   const diff = req.params.diff as string;
 
-  if (!contains(method, diff)) return void res.send(false);
+  if (!contains(DIFFICULTY, diff)) return void res.send(false);
 
   res.json(store[diff]);
 });
@@ -39,7 +30,7 @@ app.get('/get/:diff', (req: Request, res: Response) => {
 app.get('/register/:diff', (req: Request, res: Response) => {
   const diff = req.params.diff as string;
 
-  if (!contains(method, diff)) return void res.send(false);
+  if (!contains(DIFFICULTY, diff)) return void res.send(false);
   if (!req.query || !req.query.name || !req.query.sec)
     return void res.send(false);
 
@@ -67,7 +58,7 @@ app.get('/reset', (req: Request, res: Response) => {
 app.get('/delete/:diff', (req: Request, res: Response) => {
   const diff = req.params.diff as string;
 
-  if (!contains(method, diff)) return void res.send(false);
+  if (!contains(DIFFICULTY, diff)) return void res.send(false);
   if (!req.query.name) return void res.send(false);
 
   const name = req.query.name as string;
@@ -76,6 +67,9 @@ app.get('/delete/:diff', (req: Request, res: Response) => {
 
   res.send(true);
 });
+
+// 30분 마다 파일에 저장
+setInterval(() => writeStoreToFile(store), 1000 * 60 * 30);
 
 app.listen(port, () => {
   console.log(`server is listening...`);

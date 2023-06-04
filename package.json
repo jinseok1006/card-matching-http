@@ -6,9 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pm2": "pm2 start ./dist/app.js --time",
-    "dev": "tsc && node dist/app.js",
-    "start": "node dist/app.js",
-    "send": "scp -r dist package.json package-lock.json jinseok@3.34.97.153:app"
+    "send": "tsc && scp -r dist package.json package-lock.json jinseok@3.34.97.153:app"
   },
   "keywords": [],
   "author": "",

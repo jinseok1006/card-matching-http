@@ -3,7 +3,12 @@ import type { Request, Response } from 'express';
 import helmet from 'helmet';
 
 import { contains } from './util';
-import { DIFFICULTY, readStoreFromFile, writeStoreToFile } from './store';
+import {
+  DIFFICULTY,
+  binarySearchInsert,
+  readStoreFromFile,
+  writeStoreToFile,
+} from './store';
 import type { Store, Rank } from './store';
 
 const app = express();
@@ -34,15 +39,14 @@ app.get('/register/:diff', (req: Request, res: Response) => {
   if (!req.query || !req.query.name || !req.query.sec)
     return void res.send(false);
 
-  const rank = {
-    name: req.query.name as string,
-    sec: parseFloat(req.query.sec as string),
-  };
+  const name = req.query.name as string;
+  const sec = parseFloat(req.query.sec as string);
 
-  store[diff].push(rank);
-  store[diff].sort((a, b) => a.sec - b.sec);
+  const rank = { name, sec };
 
-  console.log(`ip: ${req.ip}, rank: ${JSON.stringify(rank)}`);
+  binarySearchInsert(store[diff], rank);
+
+  console.log(`ip: ${req.ip}, name: ${name}, sec: ${sec}`);
 
   res.send(true);
 });
@@ -63,13 +67,13 @@ app.get('/delete/:diff', (req: Request, res: Response) => {
 
   const name = req.query.name as string;
 
-  store[diff] = store[diff].filter((rank, idx) => name !== rank.name);
+  store[diff] = store[diff].filter((rank) => name !== rank.name);
 
   res.send(true);
 });
 
-// 30분 마다 파일에 저장
-setInterval(() => writeStoreToFile(store), 1000 * 60 * 30);
+// 1시간 마다 파일에 저장
+setInterval(() => writeStoreToFile(store), 1000 * 60 * 60);
 
 app.listen(port, () => {
   console.log(`server is listening...`);

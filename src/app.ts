@@ -72,6 +72,11 @@ app.get('/delete/:diff', (req: Request, res: Response) => {
   res.send(true);
 });
 
+app.get('/save', (req: Request, res: Response) => {
+  writeStoreToFile(store);
+  res.send(true);
+});
+
 // 1시간 마다 파일에 저장
 setInterval(() => writeStoreToFile(store), 1000 * 60 * 60);
 

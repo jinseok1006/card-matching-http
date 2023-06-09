@@ -4,3 +4,19 @@ export function contains<T extends string>(
 ): value is T {
   return list.some((item) => item === value);
 }
+
+export const dateToString = (date: Date) => {
+  return (
+    date.getFullYear() +
+    '-' +
+    date.getMonth() +
+    '-' +
+    date.getDate() +
+    ' ' +
+    date.getHours() +
+    ':' +
+    date.getMinutes() +
+    ':' +
+    date.getSeconds()
+  );
+};

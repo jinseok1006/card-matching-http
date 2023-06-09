@@ -2,7 +2,7 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import helmet from 'helmet';
 
-import { contains } from './util';
+import { contains, dateToString } from './util';
 import {
   DIFFICULTY,
   binarySearchInsert,
@@ -39,10 +39,12 @@ app.get('/register/:diff', (req: Request, res: Response) => {
   if (!req.query || !req.query.name || !req.query.sec)
     return void res.send(false);
 
+  const now = new Date();
+  const date = dateToString(now);
   const name = req.query.name as string;
   const sec = parseFloat(req.query.sec as string);
 
-  const rank = { name, sec };
+  const rank = { date, name, sec };
 
   binarySearchInsert(store[diff], rank);
 
@@ -72,9 +74,13 @@ app.get('/delete/:diff', (req: Request, res: Response) => {
   res.send(true);
 });
 
-app.get('/save', (req: Request, res: Response) => {
-  writeStoreToFile(store);
-  res.send(true);
+app.get('/save', async (req: Request, res: Response) => {
+  try {
+    await writeStoreToFile(store);
+    res.send(true);
+  } catch (err) {
+    res.send(false);
+  }
 });
 
 // 1시간 마다 파일에 저장
